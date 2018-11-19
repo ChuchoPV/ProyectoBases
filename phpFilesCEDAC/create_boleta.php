@@ -10,36 +10,48 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 include_once 'Database.php';
  
 // instantiate product object
-include_once 'Alumno.php';
  
 $database = new Database();
 $db = $database->getConnection();
  
-$alumno = new Alumno($db);
  
 // get posted data
 $data = json_decode(file_get_contents("php://input"));
  
 // make sure data is not empty
 if(
-    !empty($data->CveA) &&
-    !empty($data->nombre) &&
-    !empty($data->fechanaci) &&
-    !empty($data->tel) &&
-    !empty($data->direccion) &&
-    !empty($data->mail)
+    !empty($data->CveAct) &&
+    !empty($data->CveAlu) &&
+    !empty($data->fecha) &&
+    !empty($data->comments) &&
+    !empty($data->evaluacion)
+
 ){
  
     // set product property values
-    $alumno->nombre = $data->nombre;
-    $alumno->CveAlu = $data->CveA;
-    $alumno->fechanaci = $data->fechanaci;
-    $alumno->tel = $data->tel;
-    $alumno->direccion = $data->direccion;
-    $alumno->mail = $data->mail;
- 
-    // create the product
-    if($alumno->create()){
+    $CveAct = $data->CveAct;
+    $CveAlu = $data->CveAlu;
+    $fechab = $data->fecha;
+    $comments = $data->comments;
+    $evaluacion = $data->evaluacion;
+
+    // query to insert record
+    $query = "INSERT INTO 
+                    BOLETA(CveAlu, CveAct, fechab, evaluacion, comments)
+                Values(:CveAlu, :CveAct, :fechab, :evaluacion, :comments)"; //2, 1, "2018-01-02", 5, 'Comentario'
+
+    // prepare query
+    $stmt = $db->prepare($query);
+
+    // bind values
+    $stmt->bindParam(":CveAlu", $CveAlu);
+    $stmt->bindParam(":CveAct", $CveAct);
+    $stmt->bindParam(":fechab", $fechab);
+    $stmt->bindParam(":evaluacion", $evaluacion);
+    $stmt->bindParam(":comments", $comments);
+
+    //execute query
+    if($stmt->execute()){
  
         // set response code - 201 created
         http_response_code(201);
@@ -58,7 +70,6 @@ if(
         echo json_encode(array("message" => "Unable to create product."));
     }
 }
- 
 // tell the user data is incomplete
 else{
  

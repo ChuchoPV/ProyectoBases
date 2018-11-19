@@ -8,30 +8,47 @@ header('Content-Type: application/json');
  
 // include database and object files
 include_once 'Database.php';
-include_once 'Alumno.php';
  
 // get database connection
 $database = new Database();
 $db = $database->getConnection();
  
-// prepare product object
-$alumno = new Alumno($db);
- 
 // set ID property of record to read
-$alumno->CveAlu = isset($_GET['CveA']) ? $_GET['CveA'] : die();
+$CveAct = isset($_GET['CveM']) ? $_GET['CveM'] : die();
+$nombre;
  
 // read the details of product to be edited
-$alumno->readOne();
- 
-if($alumno->nombre!=null){
+// query to read single record
+$query = "SELECT
+            p.CveAct, p.nombrem
+            FROM
+            Actividad p
+            WHERE
+            p.CveAct = ?";                
+
+// prepare query statement
+$stmt = $db->prepare( $query );
+
+// bind CveM of product to be updated
+$stmt->bindParam(1, $CveAct);
+
+// execute query
+$stmt->execute();
+
+// get retrieved row
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+extract($row);
+
+// set values to object properties
+$nombre = $row['nombrem'];
+$CveAct = $row['CveAct'];
+
+if($nombre!=null){
     // create array
     $alumno_arr = array(
-        "CveA" =>  $alumno->CveAlu,
-        "nombre" => $alumno->nombre,
-        "fechanaci" => $alumno->fechanaci,
-        "tel" => $alumno->tel,
-        "direccion" => $alumno->direccion,
-        "mail" => $alumno->mail
+        "CveM" =>  $CveAct,
+        "nombre" => $nombre
     );
  
     // set response code - 200 OK
@@ -46,6 +63,6 @@ else{
     http_response_code(404);
  
     // tell the user product does not exist
-    echo json_encode(array("message" => "Product does not exist."));
+    echo json_encode(array("message" => "Materia no existe."));
 }
 ?>

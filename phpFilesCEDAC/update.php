@@ -17,15 +17,18 @@ $db = $database->getConnection();
 // prepare alumno object
 $alumno = new Alumno($db);
  
-// get matricula of alumno to be edited
+// get CveA of alumno to be edited
 $data = json_decode(file_get_contents("php://input"));
  
-// set matricula property of alumno to be edited
-$alumno->matricula = $data->matricula;
+// set CveA property of alumno to be edited
+$alumno->CveA = $data->CveA;
  
 // set alumno property values
 $alumno->nombre = $data->nombre;
-$alumno->carrera = $data->carrera;
+$alumno->fechanaci = $data->fechanaci;
+$alumno->tel = $data->tel;
+$alumno->direccion = $data->direccion;
+$alumno->mail = $data->mail;
  
 // update the alumno
 if($alumno->update()){

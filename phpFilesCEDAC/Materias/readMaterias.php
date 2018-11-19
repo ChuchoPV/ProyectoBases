@@ -5,17 +5,26 @@ header("Content-Type: application/json; charset=UTF-8");
  
 // include database and object files
 include_once 'Database.php';
-include_once 'Alumno.php';
+//include_once 'Alumno.php';
  
 // instantiate database and product object
 $database = new Database;
 $db = $database->getConnection();
  
 // initialize object
-$alumno = new Alumno($db);
+//$alumno = new Alumno($db);
  
-// query products
-$stmt = $alumno->read();
+// select all query
+$query = "SELECT
+            *
+            FROM
+            Actividad";
+
+//prepare query statement
+$stmt = $db->prepare($query);
+
+// execute query
+$stmt->execute();
 $num = $stmt->rowCount();
  
 // check if more than 0 record found
@@ -34,16 +43,10 @@ if($num>0){
         // just $name only
         extract($row);
  
-        $alumno_item=array(
-            "CveA" => $CveAlu,
-            "nombre" => $nombre,
-            "fechanaci" => $fechanaci,
-            "tel" => $tel,
-            "direccion" => $direccion,
-            "mail" => $mail
-
+        $alumno_item=array( 
+            "CveM" => $CveAct,
+            "nombre" => $nombrem
         );
- 
         array_push($alumnos_arr["records"], $alumno_item);
     }
  
@@ -61,7 +64,7 @@ else{
  
     // tell the user no products found
     echo json_encode(
-        array("message" => "No products found.")
+        array("message" => "No materias found.")
     );
 }
 ?>

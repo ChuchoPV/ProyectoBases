@@ -4,9 +4,12 @@ class Alumno{
     // database connection and table nombre
     private $conn;
     private $table_name = "ALUMNO";
+    private $table_materia = 'MATERIA';
+    private $table_alumno_materia = 'ALUMNOMATERIA';
+    private $boleta = 'BOLETA';
  
     // object properties
-    public $CveA;
+    public $CveAlu;
     public $nombre;
     public $fechanaci;
     public $tel;
@@ -22,7 +25,7 @@ class Alumno{
     function read(){
       // select all query
       $query = "SELECT
-		              p.CveA, p.nombre, p.fechanaci, p.tel, p.direccion, p.mail
+		              p.CveAlu, p.nombre, p.fechanaci, p.tel, p.direccion, p.mail
 		            FROM
                   " . $this->table_name . " p";
 
@@ -35,6 +38,25 @@ class Alumno{
       return $stmt;
     }
 
+    function boleta(){
+        //query
+        $query = "SELECT a.nombre, nombrem, b.calificacion, b.fechab 
+                FROM ' . $this->boleta . ' b, ' . $this->table_name . ' a, ' . $this->table_materia . '
+                WHERE a.CveAlu = :CveAlu 
+                ORDER BY fechab";
+
+        // Prepare statement 
+        $stmt = $this->conn->prepare($query);
+
+        $this->CveAlu=htmlspecialchars(strip_tags($this->CveAlu));
+        $stmt->bindValue(":CveAlu", $this->CveAlu);
+
+        // execute the query
+        $stmt->execute();
+
+        return $stmt;
+    }
+
      // create product
     function create(){
     
@@ -42,14 +64,14 @@ class Alumno{
       $query = "INSERT INTO
                   " . $this->table_name . "
                 SET
-                  nombre=:nombre, CveA=:CveA, fechanaci=:fechanaci, tel=:tel, direccion=:direccion, mail=:mail";
+                  nombre=:nombre, CveAlu=:CveAlu, fechanaci=:fechanaci, tel=:tel, direccion=:direccion, mail=:mail";
 
       // prepare query
       $stmt = $this->conn->prepare($query);
 
       // sanitize
       $this->nombre=htmlspecialchars(strip_tags($this->nombre));
-      $this->CveA=htmlspecialchars(strip_tags($this->CveA));
+      $this->CveAlu=htmlspecialchars(strip_tags($this->CveAlu));
       $this->fechanaci=htmlspecialchars(strip_tags($this->fechanaci));
       $this->tel=htmlspecialchars(strip_tags($this->tel));
       $this->direccion=htmlspecialchars(strip_tags($this->direccion));
@@ -57,7 +79,7 @@ class Alumno{
 
       // bind values
       $stmt->bindParam(":nombre", $this->nombre);
-      $stmt->bindParam(":CveA", $this->CveA);
+      $stmt->bindParam(":CveAlu", $this->CveAlu);
       $stmt->bindParam(":fechanaci", $this->fechanaci);
       $stmt->bindParam(":tel", $this->tel);
       $stmt->bindParam(":direccion", $this->direccion);
@@ -76,19 +98,19 @@ class Alumno{
     
       // query to read single record
       $query = "SELECT
-                  p.CveA, p.nombre, p.fechanaci, p.tel, p.direccion, p.mail
+                  p.CveAlu, p.nombre, p.fechanaci, p.tel, p.direccion, p.mail
               FROM
                   " . $this->table_name . " p
               WHERE
-                  p.CveA = ?
+                  p.CveAlu = ?
               LIMIT
                   0,1";
 
       // prepare query statement
       $stmt = $this->conn->prepare( $query );
 
-      // bind CveA of product to be updated
-      $stmt->bindParam(1, $this->CveA);
+      // bind CveAlu of product to be updated
+      $stmt->bindParam(1, $this->CveAlu);
 
       // execute query
       $stmt->execute();
@@ -98,7 +120,7 @@ class Alumno{
 
       // set values to object properties
       $this->nombre = $row['nombre'];
-      $this->CveA = $row['CveA'];
+      $this->CveAlu = $row['CveAlu'];
       $this->fechanaci = $row['fechanaci'];
       $this->tel = $row['tel'];
       $this->direccion = $row['direccion'];
@@ -111,7 +133,7 @@ class Alumno{
     
       // update query
       $query = "UPDATE
-                  ' . $this->table_name . ''
+                  ' . $this->table_name . '
                 SET
                   nombre = :nombre,
                   fechanaci = :fechanaci,
@@ -119,14 +141,14 @@ class Alumno{
                   tel = :tel,
                   mail = :mail
                  WHERE
-                  CveA = :CveA";
+                  CveAlu = :CveAlu";
 
       // prepare query statement
       $stmt = $this->conn->prepare($query); 
 
       // sanitize
       $this->nombre=htmlspecialchars(strip_tags($this->nombre));
-      $this->CveA=htmlspecialchars(strip_tags($this->CveA));
+      $this->CveAlu=htmlspecialchars(strip_tags($this->CveAlu));
       $this->fechanaci=htmlspecialchars(strip_tags($this->fechanaci));
       $this->tel=htmlspecialchars(strip_tags($this->tel));
       $this->direccion=htmlspecialchars(strip_tags($this->direccion));
@@ -134,7 +156,7 @@ class Alumno{
 
       // bind values
       $stmt->bindParam(":nombre", $this->nombre);
-      $stmt->bindParam(":CveA", $this->CveA);
+      $stmt->bindParam(":CveAlu", $this->CveAlu);
       $stmt->bindParam(":fechanaci", $this->fechanaci);
       $stmt->bindParam(":tel", $this->tel);
       $stmt->bindParam(":direccion", $this->direccion);
@@ -152,16 +174,16 @@ class Alumno{
     function delete(){
     
       // delete query
-      $query = "DELETE FROM " . $this->table_name . " WHERE CveA = ?";
+      $query = "DELETE FROM " . $this->table_name . " WHERE CveAlu = ?";
 
       // prepare query
       $stmt = $this->conn->prepare($query);
 
       // sanitize
-      $this->CveA=htmlspecialchars(strip_tags($this->CveA));
+      $this->CveAlu=htmlspecialchars(strip_tags($this->CveAlu));
 
-      // bind CveA of record to delete
-      $stmt->bindParam(1, $this->CveA);
+      // bind CveAlu of record to delete
+      $stmt->bindParam(1, $this->CveAlu);
 
       // execute query
       if($stmt->execute()){
@@ -177,11 +199,11 @@ class Alumno{
     
       // select all query
       $query = "SELECT
-                  p.CveA, p.nombre, p.fechanaci, p.tel, p.direccion, p.mail
+                  p.CveAlu, p.nombre, p.fechanaci, p.tel, p.direccion, p.mail
                 FROM
                     " . $this->table_name . " p
                 WHERE
-                    p.nombre LIKE ? or p.CveA LIKE ? or c.fechanaci LIKE ?";
+                    p.nombre LIKE ? or p.CveAlu LIKE ? or c.fechanaci LIKE ?";
 
       // prepare query statement
       $stmt = $this->conn->prepare($query);

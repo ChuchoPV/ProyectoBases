@@ -10,36 +10,39 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 include_once 'Database.php';
  
 // instantiate product object
-include_once 'Alumno.php';
  
 $database = new Database();
 $db = $database->getConnection();
  
-$alumno = new Alumno($db);
  
 // get posted data
 $data = json_decode(file_get_contents("php://input"));
  
 // make sure data is not empty
 if(
-    !empty($data->CveA) &&
-    !empty($data->nombre) &&
-    !empty($data->fechanaci) &&
-    !empty($data->tel) &&
-    !empty($data->direccion) &&
-    !empty($data->mail)
+    !empty($data->CveM) &&
+    !empty($data->nombre)
 ){
  
     // set product property values
-    $alumno->nombre = $data->nombre;
-    $alumno->CveAlu = $data->CveA;
-    $alumno->fechanaci = $data->fechanaci;
-    $alumno->tel = $data->tel;
-    $alumno->direccion = $data->direccion;
-    $alumno->mail = $data->mail;
- 
-    // create the product
-    if($alumno->create()){
+    $nombre = $data->nombre;
+    $CveM = $data->CveM;
+
+    // query to insert record
+    $query = "INSERT INTO
+                Actividad
+            SET
+                nombrem=:nombre, CveAct=:CveM";
+
+    // prepare query
+    $stmt = $db->prepare($query);
+
+    // bind values
+    $stmt->bindParam(":nombre", $nombre);
+    $stmt->bindParam(":CveM", $CveM);
+
+    //execute query
+    if($stmt->execute()){
  
         // set response code - 201 created
         http_response_code(201);
