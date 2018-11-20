@@ -31,9 +31,6 @@ export class ReadAlumnos extends React.Component{
           CveAct : Cveact,
           fechab : fechaB
       });
-
-      console.log(this.state);
-
   }
 
 
